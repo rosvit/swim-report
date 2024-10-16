@@ -36,7 +36,7 @@ object SwimStroke {
     case fit.SwimStroke.BREASTSTROKE => Breaststroke
     case fit.SwimStroke.BACKSTROKE   => Backstroke
     case fit.SwimStroke.BUTTERFLY    => Butterfly
-    case fit.SwimStroke.MIXED        => Mixed
+    case fit.SwimStroke.MIXED | null => Mixed // Coros FIT files contain null instead MIXED for mixed laps
     case _                           => Other
   }
 }

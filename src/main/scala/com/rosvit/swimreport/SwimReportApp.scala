@@ -18,6 +18,9 @@ object SwimReportApp
       header = "Swimming activity report from FIT file",
       version = BuildInfo.version
     ) {
+
+  private inline val FitSportErrorMessage = "FIT file doesn't contain valid pool swim activity"
+
   override def main: Opts[IO[ExitCode]] =
     reportOpts
       .map { case ReportArgs(output, ignoreIntegrity, path) =>
@@ -27,11 +30,15 @@ object SwimReportApp
   private def doReport(fitPath: Path, ignoreIntegrity: Boolean, output: OutputType): IO[ExitCode] =
     (for {
       fitReader <- FitReader.make[IO]
+      reportProcessor <- ReportProcessor.make[IO]
       fileStatus <- fitReader.checkIntegrity(fitPath)
       _ <-
         if (fileStatus == Ok || (fileStatus == IntegrityCheckFailed && ignoreIntegrity)) IO.unit
         else IO.raiseError(ReportException(fileStatus.message))
-      _ <- fitReader.messages(fitPath).evalMap(IO.println).compile.drain // TODO temp until stream processor is finished
+      messages = fitReader.messages(fitPath)
+      maybeReport <- reportProcessor.process(messages)
+      report <- maybeReport.fold(IO.raiseError(ReportException(FitSportErrorMessage)))(r => IO.pure(r))
+      _ <- IO.println(report) // TODO temp until result presenter is finished
     } yield ExitCode.Success)
       .recoverWith(cause => Console[IO].errorln(s"ERROR: ${cause.getMessage}").as(ExitCode.Error))
 }

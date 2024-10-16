@@ -7,12 +7,16 @@ Simple CLI application that reads a FIT file of a lap swim activity and produces
 ## Features
 
 - Text or JSON output
-- General swim activity details
+- General swim activity details:
+    - Pool length
+    - Number of lengths swum and total distance (all swim strokes combined)
+    - Average heart rate
+    - Activity duration
+    - Activity start time
 - Total distance swum for each stroke
 - Number of pool lengths swum for each stroke
-- Longest continuous swim distance for each stroke
-- Average swim speed information for each interval
-- Average heart rate information
+- Longest continuous swim interval for each stroke (calculated from single stroke laps only)
+- Average swim pace for each swim stroke
 - Total rest time
 - Option to force an attempt to read a corrupt FIT file
 

@@ -18,6 +18,8 @@ lazy val root = (project in file("."))
       catsEffect,
       declineEffect,
       fs2Core,
+      circe,
+      circeGeneric,
       fitSdk,
       scalaTest,
       catsEffectScalaTest
