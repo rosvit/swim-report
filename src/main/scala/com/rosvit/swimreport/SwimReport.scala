@@ -1,8 +1,8 @@
 package com.rosvit.swimreport
 
 import com.rosvit.swimreport.fit.SwimStroke
-import io.circe.{Encoder, KeyEncoder}
 import io.circe.generic.semiauto.*
+import io.circe.{Encoder, KeyEncoder}
 
 import java.time.{Duration, Instant}
 

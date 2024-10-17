@@ -38,7 +38,14 @@ object SwimReportApp
       messages = fitReader.messages(fitPath)
       maybeReport <- reportProcessor.process(messages)
       report <- maybeReport.fold(IO.raiseError(ReportException(FitSportErrorMessage)))(r => IO.pure(r))
-      _ <- IO.println(report) // TODO temp until result presenter is finished
+      _ <- printReport(output, report)
     } yield ExitCode.Success)
       .recoverWith(cause => Console[IO].errorln(s"ERROR: ${cause.getMessage}").as(ExitCode.Error))
+
+  private def printReport(output: OutputType, report: SwimReport): IO[Unit] = IO.println {
+    output match {
+      case OutputType.Text => ReportTemplate.text(report)
+      case OutputType.Json => ReportTemplate.jsonString(report)
+    }
+  }
 }
