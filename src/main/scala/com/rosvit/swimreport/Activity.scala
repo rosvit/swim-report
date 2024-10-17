@@ -9,7 +9,8 @@ final case class Activity(
     distance: Float,
     duration: Float,
     startTime: Instant,
-    avgHr: Short,
+    utcOffsetSecs: Int,
+    avgHr: Int,
     lengths: List[Length],
     laps: List[Lap],
     rests: List[Rest]
@@ -17,13 +18,14 @@ final case class Activity(
 
 object Activity {
 
-  def empty: Activity = Activity(0f, 0f, 0f, Instant.now, 0, Nil, Nil, Nil)
+  def empty: Activity = Activity(0f, 0f, 0f, Instant.now, 0, 0, Nil, Nil, Nil)
 
   def apply(msg: SessionMessage): Activity = Activity(
     poolLength = msg.poolLengthMeters,
     distance = msg.distance,
     duration = msg.timerTime,
     startTime = msg.startTime,
+    utcOffsetSecs = 0,
     avgHr = msg.avgHr,
     lengths = Nil,
     laps = Nil,
@@ -31,7 +33,7 @@ object Activity {
   )
 }
 
-final case class Lap(swimStroke: SwimStroke, distance: Float, lengthCount: Int, duration: Float, avgHr: Short)
+final case class Lap(swimStroke: SwimStroke, distance: Float, lengthCount: Int, duration: Float, avgHr: Int)
 
 object Lap {
 

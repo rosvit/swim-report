@@ -1,4 +1,5 @@
 import Dependencies.*
+import org.typelevel.scalacoptions.ScalacOptions
 
 ThisBuild / scalaVersion := "3.3.4"
 ThisBuild / version := "0.1"
@@ -10,6 +11,7 @@ lazy val root = (project in file("."))
   .settings(
     name := "swim-report",
     Compile / run / fork := true,
+    Test / tpolecatExcludeOptions += ScalacOptions.warnNonUnitStatement,
     assembly / mainClass := Some("com.rosvit.swimreport.SwimReportApp"),
     scalacOptions ++= Seq("-no-indent", "-rewrite"),
     buildInfoPackage := "com.rosvit.swimreport.buildinfo",

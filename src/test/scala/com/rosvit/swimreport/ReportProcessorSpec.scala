@@ -44,7 +44,8 @@ class ReportProcessorSpec extends AsyncFlatSpec with AsyncIOSpec with Matchers w
       Freestyle -> SwimStrokeSummary(3, 75f, 50f, FormattedDuration.pace(120f)),
       Breaststroke -> SwimStrokeSummary(3, 75f, 75f, FormattedDuration.pace(160f))
     )
-    val expected = SwimReport(25f, 150f, 6, FormattedDuration(240f), startTime, 120, FormattedDuration(100f), summaries)
+    val expected =
+      SwimReport(25f, 150f, 6, FormattedDuration(240f), startTime, 0, 120, FormattedDuration(100f), summaries)
     processor.process(stream).asserting(_.value shouldEqual expected)
   }
 
@@ -68,7 +69,8 @@ class ReportProcessorSpec extends AsyncFlatSpec with AsyncIOSpec with Matchers w
       Freestyle -> SwimStrokeSummary(3, 75f, 50f, FormattedDuration.pace(120f)),
       Breaststroke -> SwimStrokeSummary(3, 75f, 25f, FormattedDuration.pace(160f))
     )
-    val expected = SwimReport(25f, 150f, 6, FormattedDuration(240f), startTime, 120, FormattedDuration(100f), summaries)
+    val expected =
+      SwimReport(25f, 150f, 6, FormattedDuration(240f), startTime, 0, 120, FormattedDuration(100f), summaries)
     processor.process(stream).asserting(_.value shouldEqual expected)
   }
 

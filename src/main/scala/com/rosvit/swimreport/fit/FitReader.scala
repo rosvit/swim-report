@@ -5,6 +5,8 @@ import cats.effect.std.{Dispatcher, Queue}
 import cats.effect.{Async, Resource, Sync}
 import cats.syntax.all.*
 import com.garmin.fit.{
+  ActivityMesg,
+  ActivityMesgListener,
   Decode,
   LapMesg,
   LapMesgListener,
@@ -71,9 +73,16 @@ object FitReader {
                         dispatcher.unsafeRunSync(queue.offer(Some(mesg.toDomain)))
                     }
                   }
+                  activityMsgListener <- Sync[F].delay {
+                    new ActivityMesgListener {
+                      override def onMesg(mesg: ActivityMesg): Unit =
+                        dispatcher.unsafeRunSync(queue.offer(Some(mesg.toDomain)))
+                    }
+                  }
                   _ <- Sync[F].delay(broadcaster.addListener(sessionMsgListener))
                   _ <- Sync[F].delay(broadcaster.addListener(lapMsgListener))
                   _ <- Sync[F].delay(broadcaster.addListener(lengthMsgListener))
+                  _ <- Sync[F].delay(broadcaster.addListener(activityMsgListener))
                   read <- Sync[F].delay(decode.read(is, broadcaster))
                   _ <- queue.offer(None)
                 } yield read

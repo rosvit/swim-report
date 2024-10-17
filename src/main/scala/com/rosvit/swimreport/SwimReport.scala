@@ -41,7 +41,8 @@ final case class SwimReport(
     lengthCount: Int,
     duration: FormattedDuration,
     startTime: Instant,
-    avgHr: Short,
+    utcOffsetSecs: Int,
+    avgHr: Int,
     rest: FormattedDuration,
     summary: Map[SwimStroke, SwimStrokeSummary]
 )

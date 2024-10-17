@@ -5,7 +5,7 @@ import io.circe.Printer
 import io.circe.syntax.*
 
 import java.time.format.{DateTimeFormatter, FormatStyle}
-import java.time.{LocalDateTime, ZonedDateTime}
+import java.time.{LocalDateTime, ZoneOffset}
 
 object ReportTemplate {
 
@@ -17,7 +17,7 @@ object ReportTemplate {
         |Lengths (total): ${sr.lengthCount}
         |Swimming time:   ${sr.duration}
         |Resting time:    ${sr.rest}
-        |Start time:      ${formatStartTime(sr.startTime)}
+        |Start time:      ${formatStartTime(sr.startTime, sr.utcOffsetSecs)}
         |Avg. HR:         ${sr.avgHr} bpm
         |${strokesTemplate(sr.summary)}""".stripMargin
 
@@ -33,9 +33,9 @@ object ReportTemplate {
       }
       .mkString("\n")
 
-  private def formatStartTime(utc: java.time.Instant): String =
+  private def formatStartTime(utc: java.time.Instant, offset: Int): String =
     LocalDateTime
-      .ofInstant(utc, ZonedDateTime.now().getZone)
+      .ofInstant(utc, ZoneOffset.ofTotalSeconds(offset))
       .format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.MEDIUM))
 
   def jsonString(sr: SwimReport): String = sr.asJson.printWith(Printer.spaces2)

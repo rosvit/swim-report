@@ -16,9 +16,10 @@ object ReportProcessor {
     messages
       .fold[Option[Activity]](None) { (acc, msg) =>
         msg match {
-          case msg: SessionMessage => processSessionMessage(acc, msg)
-          case msg: LapMessage     => processLapMessage(acc, msg)
-          case msg: LengthMessage  => processLengthMessage(acc, msg)
+          case msg: SessionMessage  => processSessionMessage(acc, msg)
+          case msg: LapMessage      => processLapMessage(acc, msg)
+          case msg: LengthMessage   => processLengthMessage(acc, msg)
+          case msg: ActivityMessage => processActivityMessage(acc, msg)
         }
       }
       .compile
@@ -53,7 +54,14 @@ object ReportProcessor {
 
   private def processLengthMessage(maybeActivity: Option[Activity], msg: LengthMessage): Option[Activity] =
     maybeActivity.orElse(Some(Activity.empty)).map { activity =>
-      activity.copy(lengths = activity.lengths :+ Length(msg.swimStroke, msg.timerTime))
+      // we are interested only in active lengths
+      if (msg.active) activity.copy(lengths = activity.lengths :+ Length(msg.swimStroke, msg.timerTime)) else activity
+    }
+
+  private def processActivityMessage(maybeActivity: Option[Activity], msg: ActivityMessage): Option[Activity] =
+    maybeActivity.orElse(Some(Activity.empty)).map { activity =>
+      val offset = msg.localTimestamp - msg.timestamp
+      activity.copy(utcOffsetSecs = offset.toInt)
     }
 
   private def toReport(activity: Activity): SwimReport =
@@ -63,6 +71,7 @@ object ReportProcessor {
       lengthCount = activity.lengths.size,
       duration = FormattedDuration(activity.duration),
       startTime = activity.startTime,
+      utcOffsetSecs = activity.utcOffsetSecs,
       avgHr = activity.avgHr,
       rest = FormattedDuration(activity.rests.map(_.duration).sum),
       summary = strokeSummary(activity)

@@ -1,6 +1,6 @@
 package com.rosvit.swimreport.fit
 
-import com.garmin.fit.{LapMesg, LengthMesg, SessionMesg}
+import com.garmin.fit.{ActivityMesg, LapMesg, LengthMesg, LengthType, SessionMesg}
 
 extension (mesg: SessionMesg) {
   def toDomain: SessionMessage =
@@ -27,5 +27,14 @@ extension (mesg: LapMesg) {
 
 extension (mesg: LengthMesg) {
   def toDomain: LengthMessage =
-    LengthMessage(swimStroke = SwimStroke.fromFitValue(mesg.getSwimStroke), timerTime = mesg.getTotalTimerTime)
+    LengthMessage(
+      swimStroke = SwimStroke.fromFitValue(mesg.getSwimStroke),
+      timerTime = mesg.getTotalTimerTime,
+      active = mesg.getLengthType == LengthType.ACTIVE
+    )
+}
+
+extension (mesg: ActivityMesg) {
+  def toDomain: ActivityMessage =
+    ActivityMessage(timestamp = mesg.getTimestamp.getTimestamp, localTimestamp = mesg.getLocalTimestamp)
 }

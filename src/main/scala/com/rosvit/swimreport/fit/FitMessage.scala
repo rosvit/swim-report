@@ -57,4 +57,6 @@ final case class LapMessage(swimStroke: SwimStroke, distance: Float, lengths: In
   def isRest: Boolean = lengths == 0 && (swimStroke == SwimStroke.Other || swimStroke == SwimStroke.Mixed)
 }
 
-final case class LengthMessage(swimStroke: SwimStroke, timerTime: Float) extends FitMessage
+final case class LengthMessage(swimStroke: SwimStroke, timerTime: Float, active: Boolean = true) extends FitMessage
+
+final case class ActivityMessage(timestamp: Long, localTimestamp: Long) extends FitMessage
