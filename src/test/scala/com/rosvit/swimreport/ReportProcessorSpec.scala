@@ -10,6 +10,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, OptionValues}
 
 import java.time.Instant
+import scala.concurrent.duration.given
 
 class ReportProcessorSpec extends AsyncFlatSpec with AsyncIOSpec with Matchers with OptionValues {
 
@@ -71,6 +72,59 @@ class ReportProcessorSpec extends AsyncFlatSpec with AsyncIOSpec with Matchers w
     )
     val expected =
       SwimReport(25f, 150f, 6, FormattedDuration(240f), startTime, 0, 120, FormattedDuration(100f), summaries)
+    processor.process(stream).asserting(_.value shouldEqual expected)
+  }
+
+  it should "skip non-active length messages" in withProcessor { processor =>
+    val startTime = Instant.now()
+    val messages: List[FitMessage] = List(
+      LengthMessage(Freestyle, 20f),
+      LengthMessage(Mixed, 10f, active = false),
+      LengthMessage(Breaststroke, 40f),
+      LengthMessage(Mixed, 33f, active = false),
+      LapMessage(Mixed, 50f, 2, 60f, 110),
+      SessionMessage(Sport.Swimming, 25f, 50f, 60f, startTime, 110)
+    )
+    val stream: Stream[IO, FitMessage] = Stream.emits(messages)
+
+    val summaries = Map(
+      Freestyle -> SwimStrokeSummary(1, 25f, 25f, FormattedDuration.pace(80f)),
+      Breaststroke -> SwimStrokeSummary(1, 25f, 25f, FormattedDuration.pace(160f))
+    )
+    val expected =
+      SwimReport(25f, 50f, 2, FormattedDuration(60f), startTime, 0, 110, FormattedDuration(0f), summaries)
+    processor.process(stream).asserting(_.value shouldEqual expected)
+  }
+
+  it should "compute time offset from activity message timestamps" in withProcessor { processor =>
+    val startTime = Instant.now()
+    val startTimestamp = startTime.getEpochSecond
+    val timeOffsetSec = 2.hours.toSeconds
+    val messages: List[FitMessage] = List(
+      LengthMessage(Freestyle, 20f),
+      LengthMessage(Breaststroke, 40f),
+      LapMessage(Mixed, 50f, 2, 60f, 110),
+      SessionMessage(Sport.Swimming, 25f, 50f, 60f, startTime, 110),
+      ActivityMessage(startTimestamp, startTimestamp + timeOffsetSec)
+    )
+    val stream: Stream[IO, FitMessage] = Stream.emits(messages)
+
+    val summaries = Map(
+      Freestyle -> SwimStrokeSummary(1, 25f, 25f, FormattedDuration.pace(80f)),
+      Breaststroke -> SwimStrokeSummary(1, 25f, 25f, FormattedDuration.pace(160f))
+    )
+    val expected =
+      SwimReport(
+        poolLength = 25f,
+        distance = 50f,
+        lengthCount = 2,
+        duration = FormattedDuration(60f),
+        startTime = startTime,
+        utcOffsetSecs = timeOffsetSec.toInt,
+        avgHr = 110,
+        rest = FormattedDuration(0f),
+        summary = summaries
+      )
     processor.process(stream).asserting(_.value shouldEqual expected)
   }
 

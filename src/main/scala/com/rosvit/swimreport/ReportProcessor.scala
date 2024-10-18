@@ -14,6 +14,10 @@ object ReportProcessor {
 
   def make[F[_]: Sync: Functor]: F[ReportProcessor[F]] = Sync[F].delay { (messages: Stream[F, FitMessage]) =>
     messages
+      .filter {
+        case LengthMessage(_, _, active) => active // we are interested only in active lengths
+        case _                           => true
+      }
       .fold[Option[Activity]](None) { (acc, msg) =>
         msg match {
           case msg: SessionMessage  => processSessionMessage(acc, msg)
@@ -44,7 +48,7 @@ object ReportProcessor {
     }
 
   private def processLapMessage(maybeActivity: Option[Activity], msg: LapMessage): Option[Activity] =
-    maybeActivity.orElse(Some(Activity.empty)).map { activity =>
+    activityOrDefault(maybeActivity).map { activity =>
       if (msg.isRest) {
         activity.copy(rests = activity.rests :+ Rest(msg.timerTime))
       } else {
@@ -53,16 +57,18 @@ object ReportProcessor {
     }
 
   private def processLengthMessage(maybeActivity: Option[Activity], msg: LengthMessage): Option[Activity] =
-    maybeActivity.orElse(Some(Activity.empty)).map { activity =>
-      // we are interested only in active lengths
-      if (msg.active) activity.copy(lengths = activity.lengths :+ Length(msg.swimStroke, msg.timerTime)) else activity
+    activityOrDefault(maybeActivity).map { activity =>
+      activity.copy(lengths = activity.lengths :+ Length(msg.swimStroke, msg.timerTime))
     }
 
   private def processActivityMessage(maybeActivity: Option[Activity], msg: ActivityMessage): Option[Activity] =
-    maybeActivity.orElse(Some(Activity.empty)).map { activity =>
+    activityOrDefault(maybeActivity).map { activity =>
       val offset = msg.localTimestamp - msg.timestamp
       activity.copy(utcOffsetSecs = offset.toInt)
     }
+
+  private def activityOrDefault(maybeActivity: Option[Activity]): Option[Activity] =
+    maybeActivity.orElse(Some(Activity.empty))
 
   private def toReport(activity: Activity): SwimReport =
     SwimReport(

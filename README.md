@@ -2,8 +2,6 @@
 
 Simple CLI application that reads a FIT file of a lap swim activity and produces summary statistics.
 
-:warning: **Project is not finished, yet!** :construction: When it is ready, this warning will be removed.
-
 ## Features
 
 - Text or JSON output
