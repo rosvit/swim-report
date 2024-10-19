@@ -20,7 +20,7 @@ Simple CLI application that reads a FIT file of a lap swim activity and produces
 
 ## Usage
 
-`swim-report` is a CLI application, Java 8 or newer is required to run it.
+`swim-report` is a CLI application, Java 11 or newer is required to run it.
 
 To download the latest available build, go to the releases in this repository or use 
 [this link](https://github.com/rosvit/swim-report/releases/latest/download/swim-report.jar).
@@ -46,6 +46,6 @@ of the native platform of your sports watch:
 
 ## Building from source
 
-JDK 8 or later and [sbt](https://www.scala-sbt.org/) are required to build the application from source.
+JDK 11 or later and [sbt](https://www.scala-sbt.org/) are required to build the application from source.
 
 Use `sbt compile` to compile the sources, `sbt test` to run the tests and `sbt assembly` to build the JAR with all dependencies.
