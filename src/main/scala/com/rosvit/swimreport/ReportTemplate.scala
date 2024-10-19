@@ -10,22 +10,21 @@ import java.time.{LocalDateTime, ZoneOffset}
 object ReportTemplate {
 
   def text(sr: SwimReport): String =
-    s"""|SWIM REPORT
-        |
+    s"""|${Console.BOLD}${Console.BLUE}SWIM REPORT${Console.RESET}
         |Pool length:     ${sr.poolLength} m
         |Distance:        ${sr.distance} m
         |Lengths (total): ${sr.lengthCount}
         |Swimming time:   ${sr.duration}
         |Resting time:    ${sr.rest}
         |Start time:      ${formatStartTime(sr.startTime, sr.utcOffsetSecs)}
-        |Avg. HR:         ${sr.avgHr} bpm
+        |Avg. HR:         ${if (sr.avgHr > 0) sr.avgHr else "N/A"} bpm
         |${strokesTemplate(sr.summary)}""".stripMargin
 
   private def strokesTemplate(summaryMap: Map[SwimStroke, SwimStrokeSummary]): String =
     summaryMap
       .map { case (stroke, summary) =>
         s"""|
-            |${stroke.toString.toUpperCase}
+            |${Console.BOLD}${Console.GREEN}${stroke.toString.toUpperCase}${Console.RESET}
             |Lengths:          ${summary.lengthCount}
             |Distance:         ${summary.distance} m
             |Average pace:     ${summary.avgPace} / 100m

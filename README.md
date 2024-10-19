@@ -22,6 +22,9 @@ Simple CLI application that reads a FIT file of a lap swim activity and produces
 
 `swim-report` is a CLI application, Java 8 or newer is required to run it.
 
+To download the latest available build, go to the releases in this repository or use 
+[this link](https://github.com/rosvit/swim-report/releases/latest/download/swim-report.jar).
+
 Read FIT file and display report:
 
 ```
@@ -33,6 +36,13 @@ For help on supported options:
 ```
 java -jar swim-report.jar --help
 ```
+
+### How to get activity FIT file
+
+To export a lap swim activity into a FIT file that can be processed by `swim-report`, please use the features
+of the native platform of your sports watch:
+- [Coros](https://support.coros.com/hc/en-us/articles/360043975752-How-to-export-workout-data-from-COROS-and-manually-upload-to-3rd-party-apps)
+- [Garmin](https://support.strava.com/hc/en-us/articles/216917807-Exporting-Files-from-Garmin-Connect)
 
 ## Building from source
 

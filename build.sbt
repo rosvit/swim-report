@@ -13,6 +13,7 @@ lazy val root = (project in file("."))
     Compile / run / fork := true,
     Test / tpolecatExcludeOptions += ScalacOptions.warnNonUnitStatement,
     assembly / mainClass := Some("com.rosvit.swimreport.SwimReportApp"),
+    assembly / assemblyJarName := "swim-report.jar",
     scalacOptions ++= Seq("-no-indent", "-rewrite"),
     buildInfoPackage := "com.rosvit.swimreport.buildinfo",
     libraryDependencies ++= Seq(

@@ -1,0 +1,26 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+env:
+  scala_version: '3.3.4'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+          cache: 'sbt'
+      - name: Assemble JAR
+        run: sbt test assembly
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: target/scala-${{ env.scala_version }}/swim-report.jar
