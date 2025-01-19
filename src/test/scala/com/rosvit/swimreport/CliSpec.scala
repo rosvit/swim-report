@@ -31,9 +31,8 @@ class CliSpec extends AsyncFlatSpec with AsyncIOSpec with Matchers {
     TestApp.run(List("-o", "text", TestFitFile)).asserting(_ shouldBe ExitCode.Success)
   }
 
-  it should "fail on unsupported output format" in {
+  it should "fail on unsupported output format" in
     TestApp.run(List("-o", "other", TestFitFile)).asserting(_ shouldBe ExitCode.Error)
-  }
 }
 
 object CliSpec {
