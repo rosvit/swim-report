@@ -4,7 +4,7 @@ object Dependencies {
 
   val catsVersion = "2.12.0"
   val catsEffectVersion = "3.5.7"
-  val declineVersion = "2.4.1"
+  val declineVersion = "2.5.0"
   val fs2Version = "3.11.0"
   val circeVersion = "0.14.10"
   val fitSdkVersion = "21.158.0"
