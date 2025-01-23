@@ -14,10 +14,11 @@ object ReportTemplate {
         |Pool length:     ${sr.poolLength} m
         |Distance:        ${sr.distance} m
         |Lengths (total): ${sr.lengthCount}
+        |Average pace:    ${sr.avgPace} / 100m
         |Swimming time:   ${sr.duration}
         |Resting time:    ${sr.rest}
         |Start time:      ${formatStartTime(sr.startTime, sr.utcOffsetSecs)}
-        |Avg. HR:         ${if (sr.avgHr > 0) sr.avgHr else "N/A"} bpm
+        |Average HR:      ${if (sr.avgHr > 0) sr.avgHr else "N/A"} bpm
         |${strokesTemplate(sr.summary)}""".stripMargin
 
   private def strokesTemplate(summaryMap: Map[SwimStroke, SwimStrokeSummary]): String =

@@ -35,8 +35,8 @@ class FitReaderSpec extends AsyncFlatSpec with AsyncIOSpec with Matchers {
       messages.collect { case m: LengthMessage => m } should have size 92
 
       messages should contain allOf (
-        LengthMessage(Breaststroke, 30.43f),
-        LapMessage(Freestyle, 50f, 2, 73.87f, 119),
+        LengthMessage(Breaststroke, 30.43f, 1),
+        LapMessage(Freestyle, 50f, 2, 78, 73.87f, 119),
         SessionMessage(Swimming, 25f, 2300f, 4011.63f, Instant.parse("2024-09-27T16:09:40Z"), 119)
       )
     }

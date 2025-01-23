@@ -19,9 +19,10 @@ extension (mesg: LapMesg) {
     LapMessage(
       swimStroke = SwimStroke.fromFitValue(mesg.getSwimStroke),
       distance = mesg.getTotalDistance,
-      lengths = mesg.getNumLengths,
+      lengths = Option(mesg.getNumActiveLengths).getOrElse(mesg.getNumLengths),
       timerTime = mesg.getTotalTimerTime,
-      avgHr = mesg.getAvgHeartRate
+      avgHr = mesg.getAvgHeartRate,
+      firstLengthIndex = mesg.getFirstLengthIndex
     )
 }
 
@@ -30,6 +31,7 @@ extension (mesg: LengthMesg) {
     LengthMessage(
       swimStroke = SwimStroke.fromFitValue(mesg.getSwimStroke),
       timerTime = mesg.getTotalTimerTime,
+      index = mesg.getMessageIndex,
       active = mesg.getLengthType == LengthType.ACTIVE
     )
 }

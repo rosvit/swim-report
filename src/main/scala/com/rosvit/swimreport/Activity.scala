@@ -33,7 +33,14 @@ object Activity {
   )
 }
 
-final case class Lap(swimStroke: SwimStroke, distance: Float, lengthCount: Int, duration: Float, avgHr: Int)
+final case class Lap(
+    swimStroke: SwimStroke,
+    distance: Float,
+    lengthCount: Int,
+    firstLengthIndex: Int,
+    duration: Float,
+    avgHr: Int
+)
 
 object Lap {
 
@@ -41,6 +48,7 @@ object Lap {
     swimStroke = msg.swimStroke,
     distance = msg.distance,
     lengthCount = msg.lengths,
+    firstLengthIndex = msg.firstLengthIndex,
     duration = msg.timerTime,
     avgHr = msg.avgHr
   )
@@ -48,4 +56,6 @@ object Lap {
 
 final case class Rest(duration: Float)
 
-final case class Length(swimStroke: SwimStroke, duration: Float)
+final case class Length(swimStroke: SwimStroke, duration: Float, index: Int)
+
+final case class Interval(swimStroke: SwimStroke, lengthCount: Int)

@@ -27,16 +27,16 @@ class ReportProcessorSpec extends AsyncFlatSpec with AsyncIOSpec with Matchers w
   it should "produce swim report" in withProcessor { processor =>
     val startTime = Instant.now()
     val messages: List[FitMessage] = List(
-      LengthMessage(Freestyle, 25f),
-      LengthMessage(Freestyle, 35f),
-      LengthMessage(Breaststroke, 30f),
-      LengthMessage(Breaststroke, 50f),
-      LengthMessage(Breaststroke, 40f),
-      LengthMessage(Freestyle, 30f),
-      LapMessage(Freestyle, 50f, 2, 60f, 120),
-      LapMessage(Breaststroke, 75f, 3, 120f, 120),
-      LapMessage(Freestyle, 25f, 1, 60f, 120),
-      LapMessage(Mixed, 0f, 0, 100f, 110),
+      LengthMessage(Freestyle, 25f, 0),
+      LengthMessage(Freestyle, 35f, 1),
+      LengthMessage(Breaststroke, 30f, 2),
+      LengthMessage(Breaststroke, 50f, 3),
+      LengthMessage(Breaststroke, 40f, 4),
+      LengthMessage(Freestyle, 30f, 5),
+      LapMessage(Freestyle, 50f, 2, 0, 60f, 120),
+      LapMessage(Breaststroke, 75f, 3, 2, 120f, 120),
+      LapMessage(Freestyle, 25f, 1, 5, 60f, 120),
+      LapMessage(Mixed, 0f, 0, 5, 100f, 110),
       SessionMessage(Sport.Swimming, 25f, 150f, 240f, startTime, 120)
     )
     val stream: Stream[IO, FitMessage] = Stream.emits(messages)
@@ -46,43 +46,66 @@ class ReportProcessorSpec extends AsyncFlatSpec with AsyncIOSpec with Matchers w
       Breaststroke -> SwimStrokeSummary(3, 75f, 75f, FormattedDuration.pace(160f))
     )
     val expected =
-      SwimReport(25f, 150f, 6, FormattedDuration(240f), startTime, 0, 120, FormattedDuration(100f), summaries)
+      SwimReport(
+        poolLength = 25f,
+        distance = 150f,
+        lengthCount = 6,
+        duration = FormattedDuration(210f),
+        startTime = startTime,
+        utcOffsetSecs = 0,
+        avgPace = FormattedDuration.pace(140f),
+        avgHr = 120,
+        rest = FormattedDuration(100f),
+        summary = summaries
+      )
     processor.process(stream).asserting(_.value shouldEqual expected)
   }
 
   it should "produce swim report from activity with mixed lap" in withProcessor { processor =>
     val startTime = Instant.now()
     val messages: List[FitMessage] = List(
-      LengthMessage(Freestyle, 25f),
-      LengthMessage(Freestyle, 35f),
-      LengthMessage(Breaststroke, 30f),
-      LengthMessage(Breaststroke, 50f),
-      LengthMessage(Breaststroke, 40f),
-      LengthMessage(Freestyle, 30f),
-      LapMessage(Mixed, 100f, 4, 180f, 120),
-      LapMessage(Freestyle, 50f, 2, 60f, 120),
-      LapMessage(Mixed, 0f, 0, 100f, 110),
-      SessionMessage(Sport.Swimming, 25f, 150f, 240f, startTime, 120)
+      LengthMessage(Freestyle, 25f, 0),
+      LengthMessage(Freestyle, 35f, 1),
+      LengthMessage(Breaststroke, 30f, 2),
+      LengthMessage(Breaststroke, 50f, 3),
+      LengthMessage(Breaststroke, 40f, 4),
+      LengthMessage(Other, 10f, 5, active = false),
+      LengthMessage(Freestyle, 30f, 6),
+      LapMessage(Mixed, 125f, 5, 0, 180f, 120),
+      LapMessage(Mixed, 0f, 0, 5, 100f, 110),
+      LapMessage(Freestyle, 25f, 1, 6, 30f, 120),
+      SessionMessage(Sport.Swimming, 25f, 150f, 210f, startTime, 120)
     )
     val stream: Stream[IO, FitMessage] = Stream.emits(messages)
 
     val summaries = Map(
       Freestyle -> SwimStrokeSummary(3, 75f, 50f, FormattedDuration.pace(120f)),
-      Breaststroke -> SwimStrokeSummary(3, 75f, 25f, FormattedDuration.pace(160f))
+      Breaststroke -> SwimStrokeSummary(3, 75f, 75f, FormattedDuration.pace(160f))
     )
     val expected =
-      SwimReport(25f, 150f, 6, FormattedDuration(240f), startTime, 0, 120, FormattedDuration(100f), summaries)
+      SwimReport(
+        poolLength = 25f,
+        distance = 150f,
+        lengthCount = 6,
+        duration = FormattedDuration(210f),
+        startTime = startTime,
+        utcOffsetSecs = 0,
+        avgPace = FormattedDuration.pace(140f),
+        avgHr = 120,
+        rest = FormattedDuration(100f),
+        summary = summaries
+      )
     processor.process(stream).asserting(_.value shouldEqual expected)
   }
 
   it should "skip non-active length messages" in withProcessor { processor =>
     val startTime = Instant.now()
     val messages: List[FitMessage] = List(
-      LengthMessage(Freestyle, 20f),
-      LengthMessage(Mixed, 10f, active = false),
-      LengthMessage(Breaststroke, 40f),
-      LengthMessage(Mixed, 33f, active = false),
-      LapMessage(Mixed, 50f, 2, 60f, 110),
+      LengthMessage(Freestyle, 20f, 0),
+      LengthMessage(Mixed, 10f, 1, active = false),
+      LengthMessage(Breaststroke, 40f, 2),
+      LengthMessage(Mixed, 33f, 3, active = false),
+      LapMessage(Mixed, 50f, 2, 0, 60f, 110),
       SessionMessage(Sport.Swimming, 25f, 50f, 60f, startTime, 110)
     )
     val stream: Stream[IO, FitMessage] = Stream.emits(messages)
@@ -92,7 +115,18 @@ class ReportProcessorSpec extends AsyncFlatSpec with AsyncIOSpec with Matchers w
       Breaststroke -> SwimStrokeSummary(1, 25f, 25f, FormattedDuration.pace(160f))
     )
     val expected =
-      SwimReport(25f, 50f, 2, FormattedDuration(60f), startTime, 0, 110, FormattedDuration(0f), summaries)
+      SwimReport(
+        poolLength = 25f,
+        distance = 50f,
+        lengthCount = 2,
+        duration = FormattedDuration(60f),
+        startTime = startTime,
+        utcOffsetSecs = 0,
+        avgPace = FormattedDuration.pace(120f),
+        avgHr = 110,
+        rest = FormattedDuration(0f),
+        summary = summaries
+      )
     processor.process(stream).asserting(_.value shouldEqual expected)
   }
 
@@ -101,9 +135,9 @@ class ReportProcessorSpec extends AsyncFlatSpec with AsyncIOSpec with Matchers w
     val startTimestamp = startTime.getEpochSecond
     val timeOffsetSec = 2.hours.toSeconds
     val messages: List[FitMessage] = List(
-      LengthMessage(Freestyle, 20f),
-      LengthMessage(Breaststroke, 40f),
-      LapMessage(Mixed, 50f, 2, 60f, 110),
+      LengthMessage(Freestyle, 20f, 0),
+      LengthMessage(Breaststroke, 40f, 1),
+      LapMessage(Mixed, 50f, 2, 0, 60f, 110),
       SessionMessage(Sport.Swimming, 25f, 50f, 60f, startTime, 110),
       ActivityMessage(startTimestamp, startTimestamp + timeOffsetSec)
     )
@@ -121,6 +155,7 @@ class ReportProcessorSpec extends AsyncFlatSpec with AsyncIOSpec with Matchers w
         duration = FormattedDuration(60f),
         startTime = startTime,
         utcOffsetSecs = timeOffsetSec.toInt,
+        avgPace = FormattedDuration.pace(120f),
         avgHr = 110,
         rest = FormattedDuration(0f),
         summary = summaries

@@ -52,11 +52,18 @@ final case class SessionMessage(
     avgHr: Short
 ) extends FitMessage
 
-final case class LapMessage(swimStroke: SwimStroke, distance: Float, lengths: Int, timerTime: Float, avgHr: Short)
-    extends FitMessage {
+final case class LapMessage(
+    swimStroke: SwimStroke,
+    distance: Float,
+    lengths: Int,
+    firstLengthIndex: Int,
+    timerTime: Float,
+    avgHr: Short
+) extends FitMessage {
   def isRest: Boolean = lengths == 0 && (swimStroke == SwimStroke.Other || swimStroke == SwimStroke.Mixed)
 }
 
-final case class LengthMessage(swimStroke: SwimStroke, timerTime: Float, active: Boolean = true) extends FitMessage
+final case class LengthMessage(swimStroke: SwimStroke, timerTime: Float, index: Int, active: Boolean = true)
+    extends FitMessage
 
 final case class ActivityMessage(timestamp: Long, localTimestamp: Long) extends FitMessage
