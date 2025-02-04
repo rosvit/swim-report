@@ -1,7 +1,7 @@
 import Dependencies.*
 import org.typelevel.scalacoptions.ScalacOptions
 
-ThisBuild / scalaVersion := "3.3.4"
+ThisBuild / scalaVersion := "3.3.5"
 ThisBuild / version := "0.2.0"
 ThisBuild / organization := "com.rosvit"
 ThisBuild / organizationName := "RoSvit"
