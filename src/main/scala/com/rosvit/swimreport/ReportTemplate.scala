@@ -22,7 +22,8 @@ object ReportTemplate {
         |${strokesTemplate(sr.summary)}""".stripMargin
 
   private def strokesTemplate(summaryMap: Map[SwimStroke, SwimStrokeSummary]): String =
-    summaryMap
+    summaryMap.toList
+      .sortBy(_._1.toString)
       .map { case (stroke, summary) =>
         s"""|
             |${Console.BOLD}${Console.GREEN}${stroke.toString.toUpperCase}${Console.RESET}
