@@ -19,6 +19,7 @@ Simple CLI application that reads a FIT file of a lap swim activity and produces
 - Number of pool lengths swum for each stroke
 - Longest continuous swim interval for each stroke
 - Average swim pace for each swim stroke
+- Average stroke count, stroke rate and SWOLF for each stroke
 - Total rest time
 - Option to force an attempt to read a corrupt FIT file
 
