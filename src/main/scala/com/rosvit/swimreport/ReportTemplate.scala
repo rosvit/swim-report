@@ -30,7 +30,10 @@ object ReportTemplate {
             |Lengths:          ${summary.lengthCount}
             |Distance:         ${summary.distance} m
             |Average pace:     ${summary.avgPace} / 100m
-            |Longest interval: ${summary.longestInterval} m""".stripMargin
+            |Longest interval: ${summary.longestInterval} m
+            |Average strokes:  ${summary.strokeCount} strokes / length
+            |Stroke rate:      ${summary.strokeRate} strokes / minute
+            |SWOLF:            ${summary.swolf}""".stripMargin
       }
       .mkString("\n")
 

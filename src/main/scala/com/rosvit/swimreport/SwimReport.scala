@@ -28,7 +28,10 @@ final case class SwimStrokeSummary(
     lengthCount: Int,
     distance: Float,
     longestInterval: Float,
-    avgPace: FormattedDuration
+    avgPace: FormattedDuration,
+    strokeCount: Int,
+    strokeRate: Int,
+    swolf: Int
 )
 
 object SwimStrokeSummary {

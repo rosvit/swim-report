@@ -56,6 +56,6 @@ object Lap {
 
 final case class Rest(duration: Float)
 
-final case class Length(swimStroke: SwimStroke, duration: Float, index: Int)
+final case class Length(swimStroke: SwimStroke, duration: Float, strokeCount: Int, strokeRate: Int, index: Int)
 
 final case class Interval(swimStroke: SwimStroke, lengthCount: Int)

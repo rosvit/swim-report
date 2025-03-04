@@ -31,6 +31,8 @@ extension (mesg: LengthMesg) {
     LengthMessage(
       swimStroke = SwimStroke.fromFitValue(mesg.getSwimStroke),
       timerTime = mesg.getTotalTimerTime,
+      strokeCount = mesg.getTotalStrokes,
+      strokeRate = mesg.getAvgSwimmingCadence,
       index = mesg.getMessageIndex,
       active = mesg.getLengthType == LengthType.ACTIVE
     )

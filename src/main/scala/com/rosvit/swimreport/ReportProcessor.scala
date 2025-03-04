@@ -15,8 +15,8 @@ object ReportProcessor {
   def make[F[_]: Sync: Functor]: F[ReportProcessor[F]] = Sync[F].delay { (messages: Stream[F, FitMessage]) =>
     messages
       .filter {
-        case LengthMessage(_, _, _, active) => active // we are interested only in active lengths
-        case _                              => true
+        case LengthMessage(_, _, _, _, _, active) => active // we are interested only in active lengths
+        case _                                    => true
       }
       .fold[Option[Activity]](None) { (acc, msg) =>
         msg match {
@@ -58,7 +58,9 @@ object ReportProcessor {
 
   private def processLengthMessage(maybeActivity: Option[Activity], msg: LengthMessage): Option[Activity] =
     activityOrDefault(maybeActivity).map { activity =>
-      activity.copy(lengths = activity.lengths :+ Length(msg.swimStroke, msg.timerTime, msg.index))
+      activity.copy(lengths =
+        activity.lengths :+ Length(msg.swimStroke, msg.timerTime, msg.strokeCount, msg.strokeRate, msg.index)
+      )
     }
 
   private def processActivityMessage(maybeActivity: Option[Activity], msg: ActivityMessage): Option[Activity] =
@@ -89,10 +91,24 @@ object ReportProcessor {
   private def strokeSummary(activity: Activity): Map[SwimStroke, SwimStrokeSummary] = {
     val detectedIntervals = detectLongestIntervals(activity.laps, activity.lengths.sortBy(_.index))
     activity.lengths.groupBy(_.swimStroke).map { case (stroke, lengths) =>
+      val totalLengths = lengths.size
+      val totalDuration = lengths.map(_.duration).sum
+      val totalStrokes = lengths.map(_.strokeCount).sum
       val longest = detectedIntervals.get(stroke).map(_ * activity.poolLength).getOrElse(activity.poolLength)
-      val distance = activity.poolLength * lengths.size
-      val pace = lengths.map(_.duration).sum / (distance / 100f)
-      stroke -> SwimStrokeSummary(lengths.size, distance, longest, FormattedDuration.pace(pace))
+      val distance = activity.poolLength * totalLengths
+      val pace = totalDuration / (distance / 100f)
+      val strokeCount = (totalStrokes / totalLengths.toDouble).ceil.toInt
+      val strokeRate = (lengths.map(_.strokeRate).sum / totalLengths.toDouble).ceil.toInt
+      val swolf = ((totalStrokes + totalDuration) / totalLengths).ceil.toInt
+      stroke -> SwimStrokeSummary(
+        totalLengths,
+        distance,
+        longest,
+        FormattedDuration.pace(pace),
+        strokeCount,
+        strokeRate,
+        swolf
+      )
     }
   }
 
