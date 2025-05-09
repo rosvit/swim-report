@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 env:
-  scala_version: '3.3.5'
+  scala_version: '3.3.6'
 
 jobs:
   build:
