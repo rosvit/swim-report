@@ -8,7 +8,7 @@ import com.rosvit.swimreport.Cli.*
 import com.rosvit.swimreport.OutputType.Text
 import com.rosvit.swimreport.buildinfo.BuildInfo
 import com.rosvit.swimreport.fit.FitFileStatus.*
-import com.rosvit.swimreport.fit.{FitFileStatus, FitReader}
+import com.rosvit.swimreport.fit.FitReader
 
 import java.nio.file.Path
 

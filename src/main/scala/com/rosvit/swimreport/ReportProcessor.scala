@@ -1,6 +1,5 @@
 package com.rosvit.swimreport
 
-import cats.Functor
 import cats.effect.Sync
 import cats.implicits.*
 import com.rosvit.swimreport.fit.*
@@ -12,7 +11,7 @@ trait ReportProcessor[F[_]] {
 
 object ReportProcessor {
 
-  def make[F[_]: Sync: Functor]: F[ReportProcessor[F]] = Sync[F].delay { (messages: Stream[F, FitMessage]) =>
+  def make[F[_]: Sync]: F[ReportProcessor[F]] = Sync[F].delay { (messages: Stream[F, FitMessage]) =>
     messages
       .filter {
         case LengthMessage(_, _, _, _, _, active) => active // we are interested only in active lengths
