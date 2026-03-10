@@ -9,7 +9,7 @@ object Dependencies {
   val circeVersion = "0.14.15"
   val fitSdkVersion = "21.195.0"
   val scalaTestVersion = "3.2.19"
-  val catsEffectScalaTestVersion = "1.7.0"
+  val catsEffectScalaTestVersion = "1.8.0"
 
   lazy val cats = "org.typelevel" %% "cats-core" % catsVersion
   lazy val catsEffect = "org.typelevel" %% "cats-effect" % catsEffectVersion
